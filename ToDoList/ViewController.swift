@@ -89,9 +89,7 @@ class ViewController: UIViewController,UITableViewDataSource {
             return items.count
     }
     
-    func tableView(tableView: UITableView,
-        cellForRowAtIndexPath
-        indexPath: NSIndexPath) -> UITableViewCell {
+    func tableView(tableView: UITableView,cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
             
             let cell =
             tableView.dequeueReusableCellWithIdentifier("Cell")
