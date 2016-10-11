@@ -23,35 +23,32 @@ class ViewController: UIViewController,UITableViewDataSource {
         title = "To-Do"
         tableview.registerClass(UITableViewCell.self,
             forCellReuseIdentifier: "Cell")
+        
+     
     }
-    
+//method to save added data to core data
     func saveName(name: String) {
-        //1
         let appDelegate =
         UIApplication.sharedApplication().delegate as! AppDelegate
         
         let managedContext = appDelegate.managedObjectContext
         
-        //2
         let entity =  NSEntityDescription.entityForName("ToDoItem",
             inManagedObjectContext:managedContext)
         
         let item = NSManagedObject(entity: entity!,
             insertIntoManagedObjectContext: managedContext)
-        
-        //3
+
         item.setValue(name, forKey: "name")
-        
-        //4
+
         do {
             try managedContext.save()
-            //5
             items.append(item)
         } catch let error as NSError  {
             print("Could not save \(error), \(error.userInfo)")
         }
     }
-
+// method to add items
     @IBAction func add(sender: AnyObject) {
         let alert = UIAlertController(title: "New Item",
             message: "Add a new item",
@@ -82,7 +79,10 @@ class ViewController: UIViewController,UITableViewDataSource {
             completion: nil)
         
     }
-
+//end method to add items
+    
+    
+//methods responsible displaying the tableview
     
     func tableView(tableView: UITableView,
         numberOfRowsInSection section: Int) -> Int {
@@ -104,19 +104,42 @@ class ViewController: UIViewController,UITableViewDataSource {
             return cell!
     }
     
-    override func viewWillAppear(animated: Bool) {
-        super.viewWillAppear(animated)
+    func tableView(tableView: UITableView, canEditRowAtIndexPath indexPath: NSIndexPath) -> Bool {
+        return true
+    }
+    
+    func tableView(tableView: UITableView, commitEditingStyle editingStyle: UITableViewCellEditingStyle, forRowAtIndexPath indexPath: NSIndexPath) {
         
-        //1
         let appDelegate =
         UIApplication.sharedApplication().delegate as! AppDelegate
         
         let managedContext = appDelegate.managedObjectContext
         
-        //2
+        if editingStyle == UITableViewCellEditingStyle.Delete {
+        
+        let cell = items[indexPath.row]
+        
+        managedContext.deleteObject(cell)
+        
+        do {
+        try managedContext.save()
+        } catch let error as NSError {
+        print("Could not save: \(error)")
+     }
+        
+        tableView.deleteRowsAtIndexPaths([indexPath], withRowAnimation: UITableViewRowAnimation.Automatic)
+    }
+}
+    
+//    fetching persisted data
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+            let appDelegate =
+            UIApplication.sharedApplication().delegate as! AppDelegate
+            
+            let managedContext = appDelegate.managedObjectContext
         let fetchRequest = NSFetchRequest(entityName: "ToDoItem")
         
-        //3
         do {
             let results =
             try managedContext.executeFetchRequest(fetchRequest)
